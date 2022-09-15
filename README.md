@@ -10,10 +10,10 @@ Framework-specific demos have their link/filename starting with the framework na
 2. [The importance of left padding on decoder-only models](https://colab.research.google.com/drive/1i0g18lUNZ2cYRms0E-gE1KCf6N4mZRwy)
 
 ### Translation
-1. TF: Using Helsinki-NLP translation models
+1. [TF: Using Helsinki-NLP translation models](https://colab.research.google.com/drive/1TKfrtpGIaNi8hRqOrWYSBjjGEAN3X_QY?usp=sharing)
 
 ## 🧨 Text to Image
-1. Stable diffusion from any input language
+1. [Stable diffusion from any input language](https://colab.research.google.com/drive/19tELXE_ljjG5yFh0qDznj6rUw90pn4Xe?usp=sharing)
 
 ## 🤖 Others
-1. TF: Model weight conversion from Hub PyTorch models
+1. [TF: Model weight conversion from Hub PyTorch models](https://colab.research.google.com/drive/1uT2qLqHd5jbiSRJNgQ8qw_YkIa4BUv2n?usp=sharing)
