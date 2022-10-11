@@ -12,6 +12,9 @@ Framework-specific demos have their link/filename starting with the framework na
 ### Translation
 1. [TF: Using Helsinki-NLP translation models](https://colab.research.google.com/drive/1TKfrtpGIaNi8hRqOrWYSBjjGEAN3X_QY?usp=sharing)
 
+## 📣 Speech
+1. [TF: Whisper + XLA generation](https://colab.research.google.com/drive/191WGH59ZZ-xyu8d6GWbuqZHa_MQJmQpA?usp=sharing)
+
 ## 🧨 Text to Image
 1. [Stable diffusion from any input language](https://colab.research.google.com/drive/19tELXE_ljjG5yFh0qDznj6rUw90pn4Xe?usp=sharing)
 
