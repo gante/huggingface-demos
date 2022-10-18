@@ -14,6 +14,7 @@ Framework-specific demos have their link/filename starting with the framework na
 
 ## 📣 Speech
 1. [TF: Whisper + XLA generation](https://colab.research.google.com/drive/191WGH59ZZ-xyu8d6GWbuqZHa_MQJmQpA?usp=sharing)
+2. [TF: How to create a TF Lite model for Whisper with generation capabilities](https://colab.research.google.com/drive/1tGL73xRs9mFUY5R03im0R6NNcvJriHun?usp=sharing)
 
 ## 🧨 Text to Image
 1. [Stable diffusion from any input language](https://colab.research.google.com/drive/19tELXE_ljjG5yFh0qDznj6rUw90pn4Xe?usp=sharing)
