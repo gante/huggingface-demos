@@ -1,2 +1,6 @@
 accelerate
 git+https://github.com/huggingface/transformers.git
+datasets
+soundfile
+librosa
+numpy==1.23.5
