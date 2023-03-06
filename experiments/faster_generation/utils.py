@@ -338,7 +338,7 @@ def run_og_model(args, processor_cls, model_cls, run_prediction_loop, queue):
     model_kwargs = {
         "pretrained_model_name_or_path": args.model,
         "device_map": "auto",
-        "max_memory": {0: str(args.max_gpu_memory)+"GiB", "cpu": "50GiB"} if args.max_gpu_memory is not None else None,
+        "max_memory": {0: str(args.max_gpu_memory)+"GiB", "cpu": "50GiB"} if args.max_gpu_memory is not None else {0: "100GiB", "cpu": "0GiB"},
         "torch_dtype": args.dtype,
         "load_in_8bit": args.load_in_8bit,
     }
