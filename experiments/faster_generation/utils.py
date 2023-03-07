@@ -314,7 +314,7 @@ def get_parsed_args():
     parser.add_argument('--aux-model', type=str)
     parser.add_argument('--dtype', type=str)
     parser.add_argument('--num-samples', type=int, default=100)
-    parser.add_argument('--max-gpu-memory', type=int)
+    parser.add_argument('--max-gpu-memory', type=int, nargs="*")
 
     args = parser.parse_args()
 
@@ -335,10 +335,19 @@ def get_parsed_args():
 
 def run_og_model(args, processor_cls, model_cls, run_prediction_loop, queue):
     tokenizer = processor_cls.from_pretrained(args.model)
+
+    if args.max_gpu_memory is None:  # fails if it doesn't fit in a GPU
+        max_memory = {0: "100GiB", "cpu": "0GiB"}
+    else:
+        max_memory = {}
+        for i in range(len(args.max_gpu_memory)):
+            max_memory[i] = str(args.max_gpu_memory[i])+"GiB"
+        max_memory["cpu"] = "50GiB"
+    print(f"Max memory allocation: {max_memory}")
     model_kwargs = {
         "pretrained_model_name_or_path": args.model,
         "device_map": "auto",
-        "max_memory": {0: str(args.max_gpu_memory)+"GiB", "cpu": "50GiB"} if args.max_gpu_memory is not None else {0: "100GiB", "cpu": "0GiB"},
+        "max_memory": max_memory,
         "torch_dtype": args.dtype,
         "load_in_8bit": args.load_in_8bit,
     }
@@ -353,10 +362,18 @@ def run_new_model(args, processor_cls, model_cls, run_prediction_loop, queue):
     aux_model = model_cls.from_pretrained(args.aux_model)
     aux_model = aux_model.to(TORCH_DEVICE)
 
+    if args.max_gpu_memory is None:  # fails if it doesn't fit in a GPU
+        max_memory = {0: "100GiB", "cpu": "0GiB"}
+    else:
+        max_memory = {}
+        for i in range(len(args.max_gpu_memory)):
+            max_memory[i] = str(args.max_gpu_memory[i])+"GiB"
+        max_memory["cpu"] = "50GiB"
+    print(f"Max memory allocation: {max_memory}")
     model_kwargs = {
         "pretrained_model_name_or_path": args.model,
         "device_map": "auto",
-        "max_memory": {0: str(args.max_gpu_memory)+"GiB", "cpu": "50GiB"} if args.max_gpu_memory is not None else None,
+        "max_memory": max_memory,
         "torch_dtype": args.dtype,
         "load_in_8bit": args.load_in_8bit,
     }
