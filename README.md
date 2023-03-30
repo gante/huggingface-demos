@@ -9,6 +9,7 @@ Framework-specific demos have their link/filename starting with the framework na
 1. [TF: XLA-accelerated Text Generation](https://colab.research.google.com/github/huggingface/blog/blob/main/notebooks/91_tf_xla_generate.ipynb)
 2. [The importance of left padding on decoder-only models](https://colab.research.google.com/drive/1i0g18lUNZ2cYRms0E-gE1KCf6N4mZRwy)
 3. [Up-to-date GPT2](https://colab.research.google.com/drive/1v2gIkaatX6CuOKkQYSYTb2C1IJkpLrKk?usp=sharing)
+4. [Text Streaming with generate](https://colab.research.google.com/drive/1MgKNzRU_WheFEkHojaJTfqLCWELWLbbY?usp=sharing)
 
 ### Translation
 1. [TF: Using Helsinki-NLP translation models](https://colab.research.google.com/drive/1TKfrtpGIaNi8hRqOrWYSBjjGEAN3X_QY?usp=sharing)
