@@ -7,37 +7,38 @@ from multiprocessing import Process, Queue
 from utils import get_mismatches, get_parsed_args, run_og_model, run_new_model
 
 TORCH_DEVICE = 0
+INPUT_LEN = 128  # in characters
 GEN_LEN = 128
 DBG = False
 
 
-def run_prediction_loop(model, tokenizer, num_samples):
+def run_prediction_loop(model, tokenizer, num_samples, assistant_model=None):
     outputs = []
     gen_time = []
     num_tokens = []
-    ds = load_dataset("cnn_dailymail", "3.0.0", split="validation", streaming=True)
+    ds = load_dataset("c4", "en", split="validation", streaming=True)
     ds_iterator = iter(ds.take(num_samples))
 
-    desc = "OG model" if not hasattr(model, "fwd_tokens") else f"NEW model ({model.fwd_tokens} tokens forwarded)"
+    desc = "OG model" if assistant_model is None else f"NEW model ({5} tokens forwarded)"
     pbar = tqdm(range(num_samples), desc)
     for _ in pbar:
-        next_data = "Article: " + next(ds_iterator)["article"] + " Summary:"
-        inputs = tokenizer([next_data], return_tensors="pt")
+        next_data = next(ds_iterator)["text"]
+        inputs = tokenizer([next_data[:INPUT_LEN]], return_tensors="pt")
         inputs = inputs.to(TORCH_DEVICE)
 
         start = time.time()
-        gen_out = model.generate(**inputs, do_sample=False, max_new_tokens=GEN_LEN)
+        gen_out = model.generate(**inputs, do_sample=False, max_new_tokens=GEN_LEN, assistant_model=assistant_model)
         end = time.time()
 
         outputs.append(tokenizer.decode(gen_out[0]))
         gen_time.append(end - start)
         num_tokens.append(gen_out.shape[1] - inputs.input_ids.shape[1])
 
-        if hasattr(model, "fwd_tokens"):
-            pbar.set_description(f"NEW model ({model.fwd_tokens} tokens forwarded)")
+        if assistant_model:
+            pbar.set_description(f"NEW model ({assistant_model.max_assistant_tokens} tokens forwarded)")
 
-    print(f"OG Average time per input (ms): {(sum(gen_time) / len(gen_time))*1000:.2f}")
-    print(f"OG Average time per token (ms): {(sum(gen_time) / sum(num_tokens))*1000:.2f}")
+    print(f"Average time per input (ms): {(sum(gen_time) / len(gen_time))*1000:.2f}")
+    print(f"Average time per token (ms): {(sum(gen_time) / sum(num_tokens))*1000:.2f}")
     return outputs
 
 

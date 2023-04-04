@@ -10,7 +10,7 @@ TORCH_DEVICE = 0
 DBG = False
 
 
-def run_prediction_loop(model, processor, num_samples):
+def run_prediction_loop(model, processor, num_samples, assistant_model=None):
     outputs = []
     gen_time = []
     num_tokens = []
@@ -18,7 +18,7 @@ def run_prediction_loop(model, processor, num_samples):
     ds = load_dataset("librispeech_asr", "clean", split="validation")
     speech_samples = ds.select(range(num_samples))[:num_samples]["audio"]
 
-    desc = "OG model" if not hasattr(model, "fwd_tokens") else f"NEW model ({model.fwd_tokens} tokens forwarded)"
+    desc = "OG model" if assistant_model is None else f"NEW model ({5} tokens forwarded)"
     pbar = tqdm(range(num_samples), desc)
     for i in pbar:
         inputs = processor.feature_extractor(
@@ -29,18 +29,18 @@ def run_prediction_loop(model, processor, num_samples):
         inputs = inputs.to(TORCH_DEVICE)
 
         start = time.time()
-        gen_out = model.generate(**inputs, do_sample=False)
+        gen_out = model.generate(**inputs, do_sample=False, assistant_model=assistant_model)
         end = time.time()
 
         outputs.append(processor.decode(gen_out[0]))
         gen_time.append(end - start)
         num_tokens.append(gen_out.shape[1])
 
-        if hasattr(model, "fwd_tokens"):
-            pbar.set_description(f"NEW model ({model.fwd_tokens} tokens forwarded)")
+        if assistant_model:
+            pbar.set_description(f"NEW model ({assistant_model.max_assistant_tokens} tokens forwarded)")
 
-    print(f"OG Average time per input (ms): {(sum(gen_time) / len(gen_time))*1000:.2f}")
-    print(f"OG Average time per token (ms): {(sum(gen_time) / sum(num_tokens))*1000:.2f}")
+    print(f"Average time per input (ms): {(sum(gen_time) / len(gen_time))*1000:.2f}")
+    print(f"Average time per token (ms): {(sum(gen_time) / sum(num_tokens))*1000:.2f}")
     return outputs
 
 
