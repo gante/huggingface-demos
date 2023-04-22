@@ -12,7 +12,7 @@ GEN_LEN = 128
 DBG = False
 
 
-def run_prediction_loop(model, tokenizer, num_samples, assistant_model=None):
+def run_prediction_loop(model, tokenizer, num_samples, temperature=None, assistant_model=None):
     outputs = []
     gen_time = []
     num_tokens = []
@@ -26,8 +26,15 @@ def run_prediction_loop(model, tokenizer, num_samples, assistant_model=None):
         inputs = tokenizer([next_data[:INPUT_LEN]], return_tensors="pt")
         inputs = inputs.to(TORCH_DEVICE)
 
+        if temperature is not None:
+            do_sample = True
+        else:
+            do_sample = False
+
         start = time.time()
-        gen_out = model.generate(**inputs, do_sample=False, max_new_tokens=GEN_LEN, assistant_model=assistant_model)
+        gen_out = model.generate(
+            **inputs, do_sample=do_sample, max_new_tokens=GEN_LEN, assistant_model=assistant_model, temperature=temperature
+        )
         end = time.time()
 
         outputs.append(tokenizer.decode(gen_out[0]))
@@ -51,13 +58,14 @@ if __name__ == "__main__":
         run_new_model(args, AutoTokenizer, AutoModelForCausalLM, run_prediction_loop, queue)
         exit()
 
-    p = Process(
-        target=run_og_model,
-        args=(args, AutoTokenizer, AutoModelForCausalLM, run_prediction_loop, queue,)
-    )
-    p.start()
-    p.join()  # this blocks until the process terminates
-    og_outputs = queue.get()
+    if args.temperature is None:
+        p = Process(
+            target=run_og_model,
+            args=(args, AutoTokenizer, AutoModelForCausalLM, run_prediction_loop, queue,)
+        )
+        p.start()
+        p.join()  # this blocks until the process terminates
+        og_outputs = queue.get()
 
     p = Process(
         target=run_new_model,
@@ -67,4 +75,5 @@ if __name__ == "__main__":
     p.join()  # this blocks until the process terminates
     new_outputs = queue.get()
 
-    get_mismatches(og_outputs, new_outputs, args.dtype)
+    if args.temperature is None:
+        get_mismatches(og_outputs, new_outputs, args.dtype)

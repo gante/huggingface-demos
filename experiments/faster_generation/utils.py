@@ -23,6 +23,7 @@ def get_parsed_args():
     parser.add_argument('model', type=str)
     parser.add_argument('--aux-model', type=str)
     parser.add_argument('--dtype', type=str)
+    parser.add_argument('--temperature', type=float)  # non None triggers sampling
     parser.add_argument('--num-samples', type=int, default=100)
     parser.add_argument('--max-gpu-memory', type=int, nargs="*")
 
@@ -62,7 +63,7 @@ def run_og_model(args, processor_cls, model_cls, run_prediction_loop, queue):
         "load_in_8bit": args.load_in_8bit,
     }
     model = model_cls.from_pretrained(**model_kwargs)
-    og_outputs = run_prediction_loop(model, tokenizer, args.num_samples)
+    og_outputs = run_prediction_loop(model, tokenizer, args.num_samples, args.temperature)
     queue.put(og_outputs)
 
 
@@ -89,5 +90,5 @@ def run_new_model(args, processor_cls, model_cls, run_prediction_loop, queue):
     }
     model = model_cls.from_pretrained(**model_kwargs)
 
-    new_outputs = run_prediction_loop(model, tokenizer, args.num_samples, aux_model)
+    new_outputs = run_prediction_loop(model, tokenizer, args.num_samples, args.temperature, aux_model)
     queue.put(new_outputs)
