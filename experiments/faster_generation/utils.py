@@ -30,6 +30,7 @@ def get_parsed_args():
     args = parser.parse_args()
 
     args.load_in_8bit = False
+    args.load_in_4bit = False
     if args.dtype is not None:
         if args.dtype == "fp16" or args.dtype == "float16":
             args.dtype = torch.float16
@@ -40,6 +41,9 @@ def get_parsed_args():
         elif args.dtype == "int8":
             args.dtype = torch.float16
             args.load_in_8bit = True
+        elif args.dtype == "fp4":
+            args.dtype = None
+            args.load_in_4bit = True
 
     return args
 
@@ -61,6 +65,7 @@ def run_og_model(args, processor_cls, model_cls, run_prediction_loop, queue):
         "max_memory": max_memory,
         "torch_dtype": args.dtype,
         "load_in_8bit": args.load_in_8bit,
+        "load_in_4bit": args.load_in_4bit,
     }
     model = model_cls.from_pretrained(**model_kwargs, use_auth_token=True)
     og_outputs = run_prediction_loop(model, tokenizer, args.num_samples, args.temperature)
@@ -87,6 +92,7 @@ def run_new_model(args, processor_cls, model_cls, run_prediction_loop, queue):
         "max_memory": max_memory,
         "torch_dtype": args.dtype,
         "load_in_8bit": args.load_in_8bit,
+        "load_in_4bit": args.load_in_4bit,
     }
     model = model_cls.from_pretrained(**model_kwargs, use_auth_token=True)
 
