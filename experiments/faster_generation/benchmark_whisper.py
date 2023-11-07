@@ -18,7 +18,7 @@ def run_prediction_loop(model, processor, num_samples, temperature=None, assista
     ds = load_dataset("librispeech_asr", "clean", split="validation")
     speech_samples = ds.select(range(num_samples))[:num_samples]["audio"]
 
-    desc = "OG model" if assistant_model is None else f"NEW model ({5} tokens forwarded)"
+    desc = "ORIGINAL model" if assistant_model is None else f"ASSISTED model"
     pbar = tqdm(range(num_samples), desc)
     for i in pbar:
         inputs = processor.feature_extractor(
@@ -40,9 +40,6 @@ def run_prediction_loop(model, processor, num_samples, temperature=None, assista
         outputs.append(processor.decode(gen_out[0]))
         gen_time.append(end - start)
         num_tokens.append(gen_out.shape[1])
-
-        if assistant_model:
-            pbar.set_description(f"NEW model ({assistant_model.max_assistant_tokens} tokens forwarded)")
 
     print(f"Average time per input (ms): {(sum(gen_time) / len(gen_time))*1000:.2f}")
     print(f"Average time per token (ms): {(sum(gen_time) / sum(num_tokens))*1000:.2f}")
