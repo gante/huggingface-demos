@@ -6,6 +6,7 @@ from tqdm import tqdm
 from utils import get_mismatches, get_parsed_args, run_model, run_model_with_assistant
 
 TORCH_DEVICE = 0
+DBG = False
 
 
 def run_prediction_loop(model, processor, num_samples, temperature=None, assistant_model=None):
@@ -47,8 +48,13 @@ def run_prediction_loop(model, processor, num_samples, temperature=None, assista
 if __name__ == "__main__":
     args = get_parsed_args()
 
+    if DBG:
+        run_model_with_assistant(args, AutoProcessor, WhisperForConditionalGeneration, run_prediction_loop)
+        exit()
+
+    if args.temperature is None:
+        og_outputs = run_model(args, AutoProcessor, WhisperForConditionalGeneration, run_prediction_loop)
     new_outputs = run_model_with_assistant(args, AutoProcessor, WhisperForConditionalGeneration, run_prediction_loop)
-    og_outputs = run_model(args, AutoProcessor, WhisperForConditionalGeneration, run_prediction_loop)
 
     if args.temperature is None:
         get_mismatches(og_outputs, new_outputs, args.dtype)
