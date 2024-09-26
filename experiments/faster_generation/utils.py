@@ -76,7 +76,7 @@ def run_model_with_assistant(args, processor_cls, model_cls, run_prediction_loop
     tokenizer = processor_cls.from_pretrained(args.model)
 
     aux_model = model_cls.from_pretrained(args.aux_model)
-    aux_model = aux_model.to(TORCH_DEVICE)
+    aux_model = aux_model.to(device=TORCH_DEVICE, dtype=args.dtype)
 
     if args.max_gpu_memory is None:  # fails if it doesn't fit in a GPU
         max_memory = {0: "100GiB", "cpu": "0GiB"}

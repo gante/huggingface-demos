@@ -18,6 +18,7 @@ def run_prediction_loop(model, processor, num_samples, temperature=None, assista
 
     desc = "ORIGINAL model" if assistant_model is None else f"ASSISTED model"
     pbar = tqdm(range(num_samples), desc)
+
     for i in pbar:
         inputs = processor.feature_extractor(
             raw_speech=[speech_samples[i]["array"]],
@@ -25,6 +26,7 @@ def run_prediction_loop(model, processor, num_samples, temperature=None, assista
             sampling_rate=16000
         )
         inputs = inputs.to(TORCH_DEVICE)
+        inputs = inputs.to(model.dtype)
 
         if temperature is not None:
             do_sample = True
