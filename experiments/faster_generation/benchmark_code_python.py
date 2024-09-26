@@ -19,7 +19,7 @@ def run_prediction_loop(model, tokenizer, num_samples, temperature=None, assista
 
     desc = "ORIGINAL model" if assistant_model is None else f"ASSISTED model"
     pbar = tqdm(range(num_samples), desc)
-    for _ in pbar:
+    for i in pbar:
         next_data = next(ds_iterator)["content"]
         inputs = tokenizer([next_data], return_tensors="pt", max_length=INPUT_LEN, truncation=True)
         inputs = inputs.to(TORCH_DEVICE)
@@ -41,8 +41,9 @@ def run_prediction_loop(model, tokenizer, num_samples, temperature=None, assista
         end = time.time()
 
         outputs.append(tokenizer.decode(gen_out[0]))
-        gen_time.append(end - start)
-        num_tokens.append(gen_out.shape[1] - inputs.input_ids.shape[1])
+        if i >= 2:  # discard first two iterations, warmup
+            gen_time.append(end - start)
+            num_tokens.append(gen_out.shape[1] - inputs.input_ids.shape[1])
 
     print(f"Average time per input (ms): {(sum(gen_time) / len(gen_time))*1000:.2f}")
     print(f"Average time per token (ms): {(sum(gen_time) / sum(num_tokens))*1000:.2f}")
