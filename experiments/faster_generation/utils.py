@@ -68,6 +68,9 @@ def run_model(args, processor_cls, model_cls, run_prediction_loop):
         "load_in_4bit": args.load_in_4bit,
     }
     model = model_cls.from_pretrained(**model_kwargs)
+    if model.generation_config.pad_token_id is None:
+        model.generation_config.pad_token_id = model.generation_config.eos_token_id
+
     og_outputs = run_prediction_loop(model, tokenizer, args.num_samples, args.temperature)
     return og_outputs
 
@@ -77,6 +80,8 @@ def run_model_with_assistant(args, processor_cls, model_cls, run_prediction_loop
 
     aux_model = model_cls.from_pretrained(args.aux_model)
     aux_model = aux_model.to(device=TORCH_DEVICE, dtype=args.dtype)
+    if aux_model.generation_config.pad_token_id is None:
+        aux_model.generation_config.pad_token_id = aux_model.generation_config.eos_token_id
 
     if args.max_gpu_memory is None:  # fails if it doesn't fit in a GPU
         max_memory = {0: "100GiB", "cpu": "0GiB"}
@@ -95,6 +100,8 @@ def run_model_with_assistant(args, processor_cls, model_cls, run_prediction_loop
         "load_in_4bit": args.load_in_4bit,
     }
     model = model_cls.from_pretrained(**model_kwargs)
+    if model.generation_config.pad_token_id is None:
+        model.generation_config.pad_token_id = model.generation_config.eos_token_id
 
     new_outputs = run_prediction_loop(model, tokenizer, args.num_samples, args.temperature, aux_model)
     return new_outputs
