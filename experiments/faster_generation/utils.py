@@ -22,6 +22,7 @@ def get_parsed_args():
     parser = argparse.ArgumentParser(description='Run the benchmark, comparing the original to the new generation.')
     parser.add_argument('model', type=str)
     parser.add_argument('--aux-model', type=str)
+    parser.add_argument('--aux-early-exit', type=int)
     parser.add_argument('--dtype', type=str)
     parser.add_argument('--temperature', type=float)  # non None triggers sampling
     parser.add_argument('--num-samples', type=int, default=20)
@@ -52,7 +53,7 @@ def run_model(args, processor_cls, model_cls, run_prediction_loop):
     tokenizer = processor_cls.from_pretrained(args.model)
 
     if args.max_gpu_memory is None:  # fails if it doesn't fit in a GPU
-        max_memory = {0: "100GiB", "cpu": "0GiB"}
+        max_memory = {0: "100GiB", "cpu": "50GiB"}
     else:
         max_memory = {}
         for i in range(len(args.max_gpu_memory)):
@@ -76,15 +77,20 @@ def run_model(args, processor_cls, model_cls, run_prediction_loop):
 
 
 def run_model_with_assistant(args, processor_cls, model_cls, run_prediction_loop):
+    assert args.aux_model is not None or args.aux_early_exit is not None
     tokenizer = processor_cls.from_pretrained(args.model)
 
-    aux_model = model_cls.from_pretrained(args.aux_model)
-    aux_model = aux_model.to(device=TORCH_DEVICE, dtype=args.dtype)
-    if aux_model.generation_config.pad_token_id is None:
-        aux_model.generation_config.pad_token_id = aux_model.generation_config.eos_token_id
+    aux_model = args.aux_model
+    if args.aux_model:
+        aux_model = model_cls.from_pretrained(args.aux_model)
+        aux_model = aux_model.to(device=TORCH_DEVICE, dtype=args.dtype)
+        if aux_model.generation_config.pad_token_id is None:
+            aux_model.generation_config.pad_token_id = aux_model.generation_config.eos_token_id
+
+    aux_early_exit = args.aux_early_exit
 
     if args.max_gpu_memory is None:  # fails if it doesn't fit in a GPU
-        max_memory = {0: "100GiB", "cpu": "0GiB"}
+        max_memory = {0: "100GiB", "cpu": "50GiB"}
     else:
         max_memory = {}
         for i in range(len(args.max_gpu_memory)):
@@ -103,5 +109,5 @@ def run_model_with_assistant(args, processor_cls, model_cls, run_prediction_loop
     if model.generation_config.pad_token_id is None:
         model.generation_config.pad_token_id = model.generation_config.eos_token_id
 
-    new_outputs = run_prediction_loop(model, tokenizer, args.num_samples, args.temperature, aux_model)
+    new_outputs = run_prediction_loop(model, tokenizer, args.num_samples, args.temperature, aux_model, aux_early_exit)
     return new_outputs
