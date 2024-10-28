@@ -10,14 +10,14 @@ INPUT_LEN = 128  # in characters
 GEN_LEN = 128
 
 
-def run_prediction_loop(model, tokenizer, num_samples, temperature=None, assistant_model=None):
+def run_prediction_loop(model, tokenizer, num_samples, temperature=None, assistant_model=None, assistant_early_exit=None):
     outputs = []
     gen_time = []
     num_tokens = []
     ds = load_dataset("allenai/c4", "en", split="validation", streaming=True)
     ds_iterator = iter(ds.take(num_samples))
 
-    desc = "ORIGINAL model" if assistant_model is None else f"ASSISTED model"
+    desc = "ORIGINAL model" if assistant_model is None and assistant_early_exit is None else f"ASSISTED model"
     pbar = tqdm(range(num_samples), desc)
     for i in pbar:
         next_data = next(ds_iterator)["text"]
@@ -31,7 +31,7 @@ def run_prediction_loop(model, tokenizer, num_samples, temperature=None, assista
 
         start = time.time()
         gen_out = model.generate(
-            **inputs, do_sample=do_sample, max_new_tokens=GEN_LEN, assistant_model=assistant_model, temperature=temperature
+            **inputs, do_sample=do_sample, max_new_tokens=GEN_LEN, assistant_model=assistant_model, early_exit=assistant_early_exit, temperature=temperature
         )
         end = time.time()
 
