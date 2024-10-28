@@ -53,7 +53,7 @@ def run_model(args, processor_cls, model_cls, run_prediction_loop):
     tokenizer = processor_cls.from_pretrained(args.model)
 
     if args.max_gpu_memory is None:  # fails if it doesn't fit in a GPU
-        max_memory = {0: "100GiB", "cpu": "0GiB"}
+        max_memory = {0: "100GiB", "cpu": "50GiB"}
     else:
         max_memory = {}
         for i in range(len(args.max_gpu_memory)):
@@ -90,7 +90,7 @@ def run_model_with_assistant(args, processor_cls, model_cls, run_prediction_loop
     aux_early_exit = args.aux_early_exit
 
     if args.max_gpu_memory is None:  # fails if it doesn't fit in a GPU
-        max_memory = {0: "100GiB", "cpu": "0GiB"}
+        max_memory = {0: "100GiB", "cpu": "50GiB"}
     else:
         max_memory = {}
         for i in range(len(args.max_gpu_memory)):
