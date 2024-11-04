@@ -40,7 +40,7 @@ If you're looking to benchmark decoder-only LLMs, the following benchmarks are a
 
 ## Supports
 
-If you're using the latest `transformers` version, the following features are active by default:
+If you're using the latest `transformers` version, the following features are enabled:
 - ✅ Assisted generation with static [DISCO](https://arxiv.org/abs/2405.04304) threshold
 - ✅ Speculative Decoding, if the assistant model has the same tokenizer and `--temperature` is set
 - ✅ [UAG](https://huggingface.co/blog/universal_assisted_generation) if the assistant model has a different tokenizer

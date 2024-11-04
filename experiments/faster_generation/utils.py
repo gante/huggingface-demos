@@ -22,8 +22,8 @@ def get_parsed_args():
     parser = argparse.ArgumentParser(
         description='Run the benchmark, comparing assisted generation vs base generation.'
     )
-    parser.add_argument('model', type=str, help='The *main* model to be used')
-    parser.add_argument('--aux-model', type=str, default=None, help='The *assistant* model to be used')
+    parser.add_argument('model', type=str, help='The HF repo of the *main* model to be used')
+    parser.add_argument('--aux-model', type=str, default=None, help='The HF repo of the *assistant* model to be used')
     parser.add_argument('--dtype', type=str, default=None, help='The data type to be used in BOTH models')
     parser.add_argument(
         '--temperature', type=float, help='The temperature value for sampling. If not set, greedy decoding is used.'
