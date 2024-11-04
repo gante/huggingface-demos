@@ -19,13 +19,21 @@ def get_mismatches(og_outputs, new_outputs, dtype=None):
 
 
 def get_parsed_args():
-    parser = argparse.ArgumentParser(description='Run the benchmark, comparing the original to the new generation.')
-    parser.add_argument('model', type=str)
-    parser.add_argument('--aux-model', type=str)
-    parser.add_argument('--dtype', type=str)
-    parser.add_argument('--temperature', type=float)  # non None triggers sampling
-    parser.add_argument('--num-samples', type=int, default=20)
-    parser.add_argument('--max-gpu-memory', type=int, nargs="*")
+    parser = argparse.ArgumentParser(
+        description='Run the benchmark, comparing assisted generation vs base generation.'
+    )
+    parser.add_argument('model', type=str, help='The *main* model to be used')
+    parser.add_argument('--aux-model', type=str, default=None, help='The *assistant* model to be used')
+    parser.add_argument('--dtype', type=str, default=None, help='The data type to be used in BOTH models')
+    parser.add_argument(
+        '--temperature', type=float, help='The temperature value for sampling. If not set, greedy decoding is used.'
+    )
+    parser.add_argument(
+        '--num-samples', type=int, default=20, help='The number of examples from the dataset to run the benchmark on'
+    )
+    parser.add_argument(
+        '--max-gpu-memory', type=int, nargs="*", default=None, help='The maximum GPU memory to be used for each GPU'
+    )
 
     args = parser.parse_args()
 

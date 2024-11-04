@@ -7,18 +7,22 @@ work with instruction-tuned models, but no chat template is applied.
 
 All scripts have the same flags, e.g. `python benchmark_code_python.py -h` yields:
 ```
-Run the benchmark, comparing the original to the new generation.
+Run the benchmark, comparing assisted generation vs base generation.
 
 positional arguments:
-  model
+  model                 The *main* model to be used
 
 options:
   -h, --help            show this help message and exit
   --aux-model AUX_MODEL
-  --dtype DTYPE
+                        The *assistant* model to be used
+  --dtype DTYPE         The data type to be used in BOTH models
   --temperature TEMPERATURE
+                        The temperature value for sampling. If not set, greedy decoding is used.
   --num-samples NUM_SAMPLES
+                        The number of examples from the dataset to run the benchmark on
   --max-gpu-memory [MAX_GPU_MEMORY ...]
+                        The maximum GPU memory to be used for each GPU
 ```
 
 Example command:
