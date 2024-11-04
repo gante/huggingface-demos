@@ -10,7 +10,7 @@ INPUT_LEN = 128  # in characters
 GEN_LEN = 128
 
 
-def run_prediction_loop(model, tokenizer, num_samples, temperature=None, assistant_model=None):
+def run_prediction_loop(model, tokenizer, num_samples, temperature=None, assistant_model=None, assistant_tokenizer=None):
     outputs = []
     gen_time = []
     num_tokens = []
@@ -24,15 +24,20 @@ def run_prediction_loop(model, tokenizer, num_samples, temperature=None, assista
         inputs = tokenizer([next_data[:INPUT_LEN]], return_tensors="pt")
         inputs = inputs.to(TORCH_DEVICE)
 
+        generate_kwargs = {
+            "do_sample": False,
+            "temperature": temperature,
+            "max_length": GEN_LEN,
+            "assistant_model": assistant_model,
+        }
         if temperature is not None:
-            do_sample = True
-        else:
-            do_sample = False
+            generate_kwargs["do_sample"] = True
+        if assistant_tokenizer is not None:
+            generate_kwargs["assistant_tokenizer"] = assistant_tokenizer
+            generate_kwargs["tokenizer"] = tokenizer
 
         start = time.time()
-        gen_out = model.generate(
-            **inputs, do_sample=do_sample, max_new_tokens=GEN_LEN, assistant_model=assistant_model, temperature=temperature
-        )
+        gen_out = model.generate(**inputs, **generate_kwargs)
         end = time.time()
 
         outputs.append(tokenizer.decode(gen_out[0]))

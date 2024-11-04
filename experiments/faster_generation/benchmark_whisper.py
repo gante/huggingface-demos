@@ -8,7 +8,7 @@ from utils import get_mismatches, get_parsed_args, run_model, run_model_with_ass
 TORCH_DEVICE = 0
 
 
-def run_prediction_loop(model, processor, num_samples, temperature=None, assistant_model=None):
+def run_prediction_loop(model, processor, num_samples, temperature=None, assistant_model=None, assistant_tokenizer=None):
     outputs = []
     gen_time = []
     num_tokens = []
@@ -28,13 +28,16 @@ def run_prediction_loop(model, processor, num_samples, temperature=None, assista
         inputs = inputs.to(TORCH_DEVICE)
         inputs = inputs.to(model.dtype)
 
+        generate_kwargs = {
+            "do_sample": False,
+            "temperature": temperature,
+            "assistant_model": assistant_model,
+        }
         if temperature is not None:
-            do_sample = True
-        else:
-            do_sample = False
+            generate_kwargs["do_sample"] = True
 
         start = time.time()
-        gen_out = model.generate(**inputs, do_sample=do_sample, assistant_model=assistant_model, temperature=temperature)
+        gen_out = model.generate(**inputs, **generate_kwargs)
         end = time.time()
 
         outputs.append(processor.decode(gen_out[0]))

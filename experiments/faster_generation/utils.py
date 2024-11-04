@@ -78,10 +78,10 @@ def run_model(args, processor_cls, model_cls, run_prediction_loop):
 def run_model_with_assistant(args, processor_cls, model_cls, run_prediction_loop):
     tokenizer = processor_cls.from_pretrained(args.model)
 
-    aux_model = model_cls.from_pretrained(args.aux_model)
-    aux_model = aux_model.to(device=TORCH_DEVICE, dtype=args.dtype)
-    if aux_model.generation_config.pad_token_id is None:
-        aux_model.generation_config.pad_token_id = aux_model.generation_config.eos_token_id
+    assistant_model = model_cls.from_pretrained(args.aux_model)
+    assistant_model = assistant_model.to(device=TORCH_DEVICE, dtype=args.dtype)
+    if assistant_model.generation_config.pad_token_id is None:
+        assistant_model.generation_config.pad_token_id = assistant_model.generation_config.eos_token_id
 
     if args.max_gpu_memory is None:  # fails if it doesn't fit in a GPU
         max_memory = {0: "100GiB", "cpu": "0GiB"}
@@ -103,5 +103,24 @@ def run_model_with_assistant(args, processor_cls, model_cls, run_prediction_loop
     if model.generation_config.pad_token_id is None:
         model.generation_config.pad_token_id = model.generation_config.eos_token_id
 
-    new_outputs = run_prediction_loop(model, tokenizer, args.num_samples, args.temperature, aux_model)
+    # If the tokenizer of the two models are different, pass `assistant_tokenizer` to trigger UAG
+    has_same_tokenizer = (
+        model.config.vocab_size == assistant_model.config.vocab_size
+        and model.config.pad_token_id == assistant_model.config.pad_token_id
+        and model.config.eos_token_id == assistant_model.config.eos_token_id
+        and model.config.bos_token_id == assistant_model.config.bos_token_id
+    )
+    if has_same_tokenizer:
+        assistant_tokenizer = None
+    else:
+        assistant_tokenizer = processor_cls.from_pretrained(args.aux_model)
+
+    new_outputs = run_prediction_loop(
+        model=model,
+        tokenizer=tokenizer,
+        num_samples=args.num_samples,
+        temperature=args.temperature,
+        assistant_model=assistant_model,
+        assistant_tokenizer=assistant_tokenizer
+    )
     return new_outputs

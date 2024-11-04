@@ -26,9 +26,9 @@ Example command:
 python benchmark_decoder_open.py facebook/opt-6.7b --aux-model facebook/opt-125m --dtype fp16
 ```
 
-## Decoder-only models
+## Decoder-only LLMs
 
-If you're looking to benchmark decoder-only models, the following benchmarks are available:
+If you're looking to benchmark decoder-only LLMs, the following benchmarks are available:
 - `benchmark_code_python.py`: prompts the model to continue a code snippet in python
 - `benchmark_decoder_open`: prompts the model to continue a random entry from the C4 dataset
 - `benchmark_decoder_summ`: prompts the model to summarize a given piece of news
@@ -37,6 +37,6 @@ If you're looking to benchmark decoder-only models, the following benchmarks are
 ## Supports
 
 If you're using the latest `transformers` version, the following feature are active by default:
-✅ Assisted generation with static [DISCO](https://arxiv.org/abs/2405.04304) threshold
-✅ Speculative Decoding, if the assistant model has the same tokenizer and `--temperature` is set
-✅ [UAG](https://huggingface.co/blog/universal_assisted_generation) if the assistant model has a different tokenizer
+- ✅ Assisted generation with static [DISCO](https://arxiv.org/abs/2405.04304) threshold
+- ✅ Speculative Decoding, if the assistant model has the same tokenizer and `--temperature` is set
+- ✅ [UAG](https://huggingface.co/blog/universal_assisted_generation) if the assistant model has a different tokenizer
