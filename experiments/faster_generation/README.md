@@ -10,12 +10,12 @@ All scripts have the same flags, e.g. `python benchmark_code_python.py -h` yield
 Run the benchmark, comparing assisted generation vs base generation.
 
 positional arguments:
-  model                 The *main* model to be used
+  model                 The HF repo of the *main* model to be used
 
 options:
   -h, --help            show this help message and exit
   --aux-model AUX_MODEL
-                        The *assistant* model to be used
+                        The HF repo of the *assistant* model to be used
   --dtype DTYPE         The data type to be used in BOTH models
   --temperature TEMPERATURE
                         The temperature value for sampling. If not set, greedy decoding is used.
